@@ -1,2 +1,4 @@
 rootProject.name = 'Vienna'
 include("Vienna-core")
+include("Vienna-processor")
+

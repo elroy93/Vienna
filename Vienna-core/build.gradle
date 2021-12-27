@@ -1,0 +1,93 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.6.0'
+    id 'java'
+    id 'base'
+    id 'maven-publish'
+    id "jacoco"
+    id 'checkstyle'
+}
+
+group 'org.onemuggle'
+version '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    google()
+}
+
+configurations {
+    all*.exclude group: "ch.qos.logback"
+    all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
+}
+
+dependencies {
+//    runtimeOnly 'com.google.auto:auto-common:1.2.1'
+
+    implementation('org.onemuggle:Vienna-processor:0.0.1-SNAPSHOT')
+    annotationProcessor('org.onemuggle:Vienna-processor:0.0.1-SNAPSHOT')
+
+
+
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+// ############################# javac的编译配置 #############################
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+//        options.compilerArgs << "-Xlint"
+//                << "-verbose"
+//                << "-XprintRounds"
+//                << "-XprintProcessorInfo"
+//                << "-Xmaxerrs" << "100000"
+//                << "-Xmaxwarns" << "100000"
+    }
+}
+
+
+
+configurations.all {
+    //每隔24小时检查远程依赖是否存在更新
+    resolutionStrategy.cacheChangingModulesFor 24, 'hours'
+    //每隔10分钟..
+    //resolutionStrategy.cacheChangingModulesFor 10, 'minutes'
+    // 采用动态版本声明的依赖缓存10分钟
+    resolutionStrategy.cacheDynamicVersionsFor 10*60, 'seconds'
+}
+
+
+// ############################# 打包配置 #############################
+publish.dependsOn build
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+// #####################################################################
+
+test {
+    useJUnitPlatform()
+}
+
+
