@@ -11,46 +11,10 @@ import javax.tools.JavaFileObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 
 class GeneralProcessorTest {
-//
-//    public static void init() {
-//        {
-//
-//            int m = 100;
-//            class R_4 implements Runnable {
-//                public void run() {
-//                    System.out.println("r4" + m);
-//                }
-//            }
-//
-//            for (int i = 0; i < 2; i++) {
-//                int x = 9;
-//                @ReNamed("R_3")
-//                Runnable r1 = new Runnable() {
-//                    public void run() {
-//                        System.out.println("r3" + m + x);
-//                    }
-//                };
-//                int y = 7;
-//                @ReNamed("R_11")
-//                Runnable r11 = new Runnable() {
-//                    public void run() {
-//                        System.out.println("r11" + m + x);
-//                    }
-//                };
-//                @ReNamed("R_22")
-//                Runnable r22 = () -> {
-//                    System.out.println("r22" + m + x);
-//                };
-//            }
-//
-//
-//            new R_4().run();
-//
-//        }
-//    }
 
 
     @Test

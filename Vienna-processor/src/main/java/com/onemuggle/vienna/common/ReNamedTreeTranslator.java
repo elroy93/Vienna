@@ -1,7 +1,9 @@
 package com.onemuggle.vienna.common;
 
 import cn.hutool.core.lang.Assert;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.TreeInfo;
 import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
@@ -66,8 +68,23 @@ public class ReNamedTreeTranslator extends TreeTranslator {
         idClazzJCVariableDeclMap.forEach((id, meta) -> {
             JCTree.JCClassDecl classDecl = meta.getClassDecl();
             classDecl.name = Utils.names.fromString(meta.getNewName());
-            classDecl.implementing = List.of(Utils.treeMaker.Ident(Utils.names.fromString("Runnable")));
+
+            JCTree.JCVariableDecl oldVar = meta.getOldVar();
+            JCTree.JCNewClass newClazz = ((JCTree.JCNewClass) oldVar.getInitializer());
+            String fatherName = "";
+            if (newClazz.clazz instanceof JCTree.JCTypeApply) {
+                JCTree.JCTypeApply typeApply = (JCTree.JCTypeApply) newClazz.clazz;
+                fatherName = typeApply.clazz.toString();
+            }
+            if (newClazz.clazz instanceof JCTree.JCIdent) {
+                fatherName = newClazz.clazz.toString();
+            }
+            classDecl.implementing = List.of(Utils.treeMaker.Ident(Utils.names.fromString(fatherName)));
+            classDecl.extending = Utils.treeMaker.Ident(Utils.names.fromString(fatherName));
+
+            meta.setFatherName(fatherName);
         });
+
 
         ListBuffer<JCTree.JCStatement> newBlockStatements = new ListBuffer<>();
         for (int i = 0; i < blockStatements.size(); i++) {
@@ -133,7 +150,7 @@ public class ReNamedTreeTranslator extends TreeTranslator {
         Integer id;
         String newName;
         JCTree.JCVariableDecl oldVar;
-        JCTree.JCVariableDecl newVar;
+        private String fatherName;
 
         public InnerClazzMeta(Integer id, String newName, JCTree.JCVariableDecl oldVar) {
             this.id = id;
@@ -165,6 +182,10 @@ public class ReNamedTreeTranslator extends TreeTranslator {
 
         public JCTree.JCVariableDecl getOldVar() {
             return oldVar;
+        }
+
+        public void setFatherName(String fatherName) {
+            this.fatherName = fatherName;
         }
     }
 
