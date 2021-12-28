@@ -1,6 +1,8 @@
 package com.onemuggle.vienna.common;
 
 import com.sun.tools.javac.api.JavacTrees;
+import com.sun.tools.javac.model.JavacElements;
+import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -37,6 +39,17 @@ public class Utils {
         return processingEnv.getFiler();
     }
 
+    public static JavacElements getElements() {
+        return processingEnv.getElementUtils();
+    }
+
+    public static JavacTypes getTypeUtils() {
+        return processingEnv.getTypeUtils();
+    }
+
+    /**
+     * #####################################################################################################################
+     */
 
     public static void log(String msg) {
         if (processingEnv.getOptions().containsKey("debug")) {
