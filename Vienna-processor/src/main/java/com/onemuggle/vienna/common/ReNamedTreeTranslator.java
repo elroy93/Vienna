@@ -1,9 +1,7 @@
 package com.onemuggle.vienna.common;
 
 import cn.hutool.core.lang.Assert;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.TreeInfo;
 import com.sun.tools.javac.tree.TreeTranslator;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
@@ -55,8 +53,22 @@ public class ReNamedTreeTranslator extends TreeTranslator {
                 java.util.List<JCTree.JCAnnotation> reNameAnnotations = annotations.stream().filter(jcAnnotation -> ((JCTree.JCIdent) jcAnnotation.annotationType).getName().toString().equals(ReNamed.class.getSimpleName())).collect(Collectors.toList());
                 Assert.state(reNameAnnotations.size() <= 1, "reNameAnnotations.size() > 1");
                 if (reNameAnnotations.size() == 1 && variableDecl.getInitializer() instanceof JCTree.JCNewClass && ((JCTree.JCNewClass) variableDecl.getInitializer()).def != null) {
-                    String newClazzName = (String) ((JCTree.JCLiteral) reNameAnnotations.get(0).getArguments().get(0).getTree()).getValue();
-                    idClazzJCVariableDeclMap.put(i, new InnerClazzMeta(i, newClazzName, variableDecl));
+                    String newClassName = null;
+                    boolean isInterface = false;
+                    List<JCTree.JCExpression> arguments = reNameAnnotations.get(0).getArguments();
+                    for (JCTree.JCExpression argument : arguments) {
+                        JCTree.JCAssign arg = (JCTree.JCAssign) argument;
+                        JCTree.JCIdent lhs = (JCTree.JCIdent) arg.lhs;
+                        JCTree.JCLiteral rhs = (JCTree.JCLiteral) arg.rhs;
+                        if (lhs.name.toString().equals("value")) {
+                            newClassName = rhs.getValue().toString();
+                        }
+                        if (lhs.name.toString().equals("isInterface")) {
+                            isInterface = (boolean) rhs.getValue();
+                        }
+                    }
+
+                    idClazzJCVariableDeclMap.put(i, new InnerClazzMeta(i, newClassName, variableDecl, isInterface));
                 }
             }
         }
@@ -73,14 +85,19 @@ public class ReNamedTreeTranslator extends TreeTranslator {
             JCTree.JCNewClass newClazz = ((JCTree.JCNewClass) oldVar.getInitializer());
             String fatherName = "";
             if (newClazz.clazz instanceof JCTree.JCTypeApply) {
+                //处理有泛型类型的，比如new Callable<Integer>
                 JCTree.JCTypeApply typeApply = (JCTree.JCTypeApply) newClazz.clazz;
                 fatherName = typeApply.clazz.toString();
             }
             if (newClazz.clazz instanceof JCTree.JCIdent) {
+                // 处理普通类型的，比如new Runnable
                 fatherName = newClazz.clazz.toString();
             }
-            classDecl.implementing = List.of(Utils.treeMaker.Ident(Utils.names.fromString(fatherName)));
-            classDecl.extending = Utils.treeMaker.Ident(Utils.names.fromString(fatherName));
+            if (meta.isInterface) {
+                classDecl.implementing = List.of(Utils.treeMaker.Ident(Utils.names.fromString(fatherName)));
+            }else {
+                classDecl.extending = Utils.treeMaker.Ident(Utils.names.fromString(fatherName));
+            }
 
             meta.setFatherName(fatherName);
         });
@@ -147,15 +164,18 @@ public class ReNamedTreeTranslator extends TreeTranslator {
 //    }
 
     static class InnerClazzMeta {
-        Integer id;
-        String newName;
-        JCTree.JCVariableDecl oldVar;
+
+        private boolean isInterface;
+        private Integer id;
+        private String newName;
+        private JCTree.JCVariableDecl oldVar;
         private String fatherName;
 
-        public InnerClazzMeta(Integer id, String newName, JCTree.JCVariableDecl oldVar) {
+        public InnerClazzMeta(Integer id, String newName, JCTree.JCVariableDecl oldVar, boolean isInterface) {
             this.id = id;
             this.newName = newName;
             this.oldVar = oldVar;
+            this.isInterface = isInterface;
         }
 
         public JCTree.JCVariableDecl getNewVar() {
@@ -186,6 +206,14 @@ public class ReNamedTreeTranslator extends TreeTranslator {
 
         public void setFatherName(String fatherName) {
             this.fatherName = fatherName;
+        }
+
+        public boolean isInterface() {
+            return isInterface;
+        }
+
+        public String getFatherName() {
+            return fatherName;
         }
     }
 

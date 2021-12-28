@@ -8,50 +8,49 @@ public class A {
     public void rStatic() {
 
         int m = 100;
-        class R{}
+        class R {
+        }
 
 
         for (int i = 0; i < 2; i++) {
 
-            class R_4 extends R implements Runnable {
+            class RR extends R implements Runnable {
                 public void run() {
                     System.out.println("r4" + m);
                 }
             }
 
             int x = 9;
-            @ReNamed("R_3")
+            @ReNamed(value = "R_3", isInterface = true)
             Runnable r1 = new Runnable() {
                 public void run() {
                     System.out.println("r3" + m + x);
                 }
             };
             int y = 7;
-            @ReNamed("R_11")
+            @ReNamed(value = "R_11", isInterface = true)
             Callable<Integer> r11 = new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
                     return 9999;
                 }
             };
-            R_4 r12 = new R_4() {
+            @ReNamed(value = "R_444", isInterface = false)
+            RR r12 = new RR() {
                 public void run() {
-                    System.out.println("R_12" + m);
+                    System.out.println("R_444" + m);
                 }
             };
 
 
-
-            @ReNamed("R_22")
+            @ReNamed(value = "R_22", isInterface = true)
             Runnable r22 = () -> {
                 System.out.println("r22" + m + x);
             };
 
-            R_4 r_4 = new R_4();
+            RR r_4 = new RR();
 
         }
-
-
 
 
     }

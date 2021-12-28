@@ -26,7 +26,7 @@ public class Enclosing {
 
         public void init() {
             int y = 1234;
-            @ReNamed("elroyRunnable1")
+            @ReNamed(value = "elroyRunnable1",isInterface = true)
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
@@ -34,7 +34,7 @@ public class Enclosing {
                 }
             };
 
-            @ReNamed("elroyRunnable2")
+            @ReNamed(value = "elroyRunnable2",isInterface = true)
             Runnable runnable2 = new Runnable() {
                 @Override
                 public void run() {
