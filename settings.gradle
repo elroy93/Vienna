@@ -1,4 +1,4 @@
-rootProject.name = 'Vienna'
-include("Vienna-core")
-include("Vienna-processor")
+rootProject.name = 'vienna'
+include("vienna-test")
+include("vienna-processor")
 
