@@ -7,7 +7,7 @@ plugins {
     id 'checkstyle'
 }
 
-group 'org.tencent'
+group 'com.tencent'
 version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -15,11 +15,14 @@ targetCompatibility = 1.8
 
 
 repositories {
+    maven {
+        url "https://mirrors.tencent.com/repository/maven/vienna"
+    }
     mavenCentral()
     mavenLocal()
     google()
     flatDir {
-        dirs = [ new File(System.getenv("JAVA_HOME") + '\\lib')]
+        dirs = [new File(System.getenv("JAVA_HOME") + '\\lib')]
     }
 
 }
@@ -50,41 +53,34 @@ dependencies {
 }
 
 // ############################# javac的编译配置 #############################
+
+compileJava {
+    if (JavaVersion.current().ordinal() > JavaVersion.VERSION_1_8.ordinal()) {
+        options.compilerArgs.addAll(["--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"])
+        options.compilerArgs.addAll(["--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED"])
+    }
+    options.encoding("UTF-8")
+}
+
+//编译参数
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
 //        options.compilerArgs << "-Xlint"
 //                << "-verbose"
-//                << "-XprintRounds"
-//                << "-XprintProcessorInfo"
-//                << "-Xmaxerrs" << "100000"
-//                << "-Xmaxwarns" << "100000"
     }
 }
 
-
 configurations.all {
     //每隔24小时检查远程依赖是否存在更新
-    resolutionStrategy.cacheChangingModulesFor 24, 'hours'
-    //每隔10分钟..
-    //resolutionStrategy.cacheChangingModulesFor 10, 'minutes'
-    // 采用动态版本声明的依赖缓存10分钟
-    resolutionStrategy.cacheDynamicVersionsFor 10 * 60, 'seconds'
+    resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
 }
 
-
 // ############################# 打包配置 #############################
-publish.dependsOn build
-//sourceSets {
-//    main {
-//        java {
-//            srcDir 'src/main/java'
-//        }
-//        resources {
-//            srcDir 'src/main/resources'
-//        }
-//
-//    }
-//}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
 
 publishing {
     publications {
@@ -94,8 +90,21 @@ publishing {
     }
     repositories {
         mavenLocal()
+        maven {
+            def releasesRepoUrl = "https://mirrors.tencent.com/repository/maven/vienna"
+            def snapshotsRepoUrl = "https://mirrors.tencent.com/repository/maven/vienna"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username "elroysu"
+                password "fef81e3051d411ec934466801c693e69"
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
     }
 }
+
 // #####################################################################
 
 test {

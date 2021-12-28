@@ -97,7 +97,6 @@ public class NamedRunnableProcessor_Old extends AbstractProcessor {
         Set<? extends Element> reNamedFields = roundEnv.getElementsAnnotatedWith(ReNamed.class);
         for (Element field : reNamedFields) {
 
-            // 字段的源码
 //            JCTree.JCVariableDecl fieldVariableDecl = (JCTree.JCVariableDecl) VennaUtils.getClassDecl(field);
 //            TypeMirror fieldTypeMirror = field.asType();
             Element fieldClazzElement = Utils.types().asElement(field.asType());
@@ -106,7 +105,6 @@ public class NamedRunnableProcessor_Old extends AbstractProcessor {
 
             ReNamed annotation = field.getAnnotation(ReNamed.class);
 
-            // 新类的名称
             String newClazzName = annotation.value();
             // 获取原始类的类型
             Symbol.ClassSymbol outerClazz = (Symbol.ClassSymbol) field.getEnclosingElement();

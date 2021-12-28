@@ -1,6 +1,7 @@
-package com.tencent.vienna.processor;
+package com.tencent.vienna.processor.old;
 
 import com.sun.tools.javac.api.JavacTrees;
+import com.tencent.vienna.processor.ReNamed;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -21,17 +22,11 @@ public class GeneralProcessor extends AbstractProcessor {
     // 异常记录，用于unitTest的assert
     private final List<String> exceptionStacks = Collections.synchronizedList(new ArrayList<>());
 
-    public JavacTrees trees;
 
     /**
      * ============================================= methods ================================================
      */
 
-    // 支持的注解类型
-//    @Override
-//    public Set<String> getSupportedAnnotationTypes() {
-//        return super.getSupportedAnnotationTypes();
-//    }
 
     // 支持的最新的类型
     @Override

@@ -12,25 +12,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-/**
- * 在代码块中的字段中标注  @ReNamed(value = "R_11",isInterface = false)
- * 可以生成相应的内部类。
- * 相当于把
- *
- * ' @ReNamed(value = "R_11",isInterface = true)
- *   Runnable r = new Runnable() {
- *     xxxx
- *   } '
- *
- * 改成
- *
- *  ' class R_11 implements Runnable() {
- *       xxxx
- *   }
- *   Runnable r = new R_11(); '
- *
- *
- */
 public class ReNamedTreeTranslator extends TreeTranslator {
 
 
@@ -60,7 +41,7 @@ public class ReNamedTreeTranslator extends TreeTranslator {
             return;
         }
 
-        // 在block中查找变量
+
         List<JCTree.JCStatement> blockStatements = jcBlock.getStatements();
         Map<Integer, InnerClazzMeta> idClazzJCVariableDeclMap = new HashMap<>();
 
@@ -109,7 +90,6 @@ public class ReNamedTreeTranslator extends TreeTranslator {
                 fatherName = typeApply.clazz.toString();
             }
             if (newClazz.clazz instanceof JCTree.JCIdent) {
-                // 处理普通类型的，比如new Runnable
                 fatherName = newClazz.clazz.toString();
             }
             if (meta.isInterface) {

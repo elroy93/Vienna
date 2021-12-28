@@ -7,7 +7,7 @@ plugins {
     id 'checkstyle'
 }
 
-group 'org.tencent'
+group 'com.tencent'
 version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -15,6 +15,24 @@ targetCompatibility = 1.8
 
 
 repositories {
+    maven {
+        url "https://mirrors.tencent.com/nexus/repository/maven-public/"
+    }
+    maven {
+        url "https://mirrors.tencent.com/repository/maven/thirdparty-snapshots"
+    }
+    maven {
+        url "https://mirrors.tencent.com/repository/maven/tencent_public_snapshots"
+    }
+    maven {
+        url "https://mirrors.tencent.com/repository/maven/thirdparty"
+    }
+    maven {
+        url "https://mirrors.tencent.com/repository/maven/vienna"
+    }
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
     mavenCentral()
     mavenLocal()
     google()
@@ -25,11 +43,16 @@ configurations {
     all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+
 dependencies {
 //    runtimeOnly 'com.google.auto:auto-common:1.2.1'
-
-    implementation('org.tencent:vienna-processor:0.0.1-SNAPSHOT')
-    annotationProcessor('org.tencent:vienna-processor:0.0.1-SNAPSHOT')
+    implementation(group: 'com.tencent', name: 'vienna-processor', version: '0.0.1-SNAPSHOT')
+//    implementation('com.tencent:vienna-processor:0.0.1-SNAPSHOT')
+    annotationProcessor('com.tencent:vienna-processor:0.0.1-SNAPSHOT')
 
 
 
@@ -52,38 +75,15 @@ gradle.projectsEvaluated {
 
 
 
-configurations.all {
-    //每隔24小时检查远程依赖是否存在更新
-    resolutionStrategy.cacheChangingModulesFor 24, 'hours'
-    //每隔10分钟..
-    //resolutionStrategy.cacheChangingModulesFor 10, 'minutes'
-    // 采用动态版本声明的依赖缓存10分钟
-    resolutionStrategy.cacheDynamicVersionsFor 10*60, 'seconds'
-}
+//configurations.all {
+//    //每隔24小时检查远程依赖是否存在更新
+//    resolutionStrategy.cacheChangingModulesFor 24, 'hours'
+//    //每隔10分钟..
+//    //resolutionStrategy.cacheChangingModulesFor 10, 'minutes'
+//    // 采用动态版本声明的依赖缓存10分钟
+//    resolutionStrategy.cacheDynamicVersionsFor 10*60, 'seconds'
+//}
 
-
-// ############################# 打包配置 #############################
-publish.dependsOn build
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/java'
-        }
-        resources {
-            srcDir 'src/main/resources'
-        }
-    }
-}
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        mavenLocal()
-    }
-}
 // #####################################################################
 
 test {
