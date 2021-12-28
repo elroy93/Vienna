@@ -2,7 +2,6 @@ package com.onemugle.vienna.core;
 
 import com.onemuggle.vienna.common.ReNamed;
 
-@SuppressWarnings("serial")
 public class TestBean {
 
     public static void main(String[] args) {
@@ -21,17 +20,19 @@ public class TestBean {
 
         for (int i = 0; i < 1; i++) {
             int x = 9;
-            @ReNamed("R_3")
+
+            @ReNamed(value = "R_3",isInterface = true)
             Runnable r1 = new Runnable() {
                 public void run() {
                     System.out.println("r3--" + m + x + this.getClass().getName());
                 }
             };
+
             int y = 7;
-            @ReNamed("R_11")
-            Runnable r11 = new Runnable() {
+            @ReNamed(value = "R_11",isInterface = false)
+            Runnable r11 = new R_4() {
                 public void run() {
-                    System.out.println("r11--" + m + x + this.getClass().getName());
+                    System.out.println("r11--" + m + y + this.getClass().getName());
                 }
             };
 
@@ -39,7 +40,6 @@ public class TestBean {
                 System.out.println("r22--" + m + x );
             };
 
-            R_4 r_4 = new R_4();
             r1.run();
             r11.run();
             r22.run();
